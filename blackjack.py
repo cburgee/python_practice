@@ -27,19 +27,18 @@ def draw(hand):
 def show_card():
     p_hand = correct_format(player_hand)
     d_hand = correct_format(dealer_hand)
-    print(f"Your cards are: {p_hand}\nDealer's cards: {d_hand}")
+    print(
+        f"Your cards are: {sum(player_hand)} {p_hand}\nDealer's cards: {sum(dealer_hand)} {d_hand}"
+    )
 
 
 def correct_format(list):
     new_list = []
     for i in list:
-        if isinstance(i, str) == False:
-            if i == 10:
-                new_list.append(random.choice(correct_suite))
-            elif i == 11 or i == 1:
-                new_list.append("A")
-            else:
-                new_list.append(i)
+        if i == 11 or i == 1:
+            new_list.append("A")
+        else:
+            new_list.append(i)
     return new_list
 
 
@@ -65,19 +64,37 @@ def calculate_winner(point_totals):
 
 
 print("Welcome to BlackJack!")
+
+# draw two cards
 for i in range(0, 2):
     player_hand = draw(player_hand)
     dealer_hand = draw(dealer_hand)
-formatted_player_hand = correct_format(player_hand)
-formatted_dealer_hand = correct_format(dealer_hand)
-show_card()
-do_add_card = input("Type 'y' to get another card, type 'n' to pass.").lower()
-while get_hand_total(player_hand) <= 21 and do_add_card == "y":
-    draw(player_hand)
+
+# if player has 21, player automatically wins.
+# if player does not have 21, player draws
+do_add_card = "y"
+while get_hand_total(player_hand) < 21 and do_add_card == "y":
     show_card()
     do_add_card = input("Type 'y' to get another card, type 'n' to pass.").lower()
+    draw(player_hand)
+# if player > 21, player busts, deal AUTOMATICALLY wins, no need to do dealer hand
+
+# dealer only goes if:
+# a) player did not have 21 immediately, or b) play did not bust
+# AND
+# dealer hand is < 17
 if get_hand_total(dealer_hand) < 17:
+    # dealer MUST continue drawing until he has >= 17
     draw(dealer_hand)
+
+# loss:
+#   player busts
+#   dealer has higher hand
+# win:
+#   player had 21 at first deal
+#   dealer busts
+#   player has a higher hand
+
 show_card()
 point_totals.append(get_hand_total(player_hand))
 point_totals.append(get_hand_total(dealer_hand))
