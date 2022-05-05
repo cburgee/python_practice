@@ -53,4 +53,5 @@ while guesses_left != 0:
         print("Too high.\nGuess again.")
         print(f"Guesses left: {guesses_left}")
         guesses_left -= 1
-print("You ran out of guesses! You lose.")
+if guesses_left == 0:
+    print("You ran out of guesses! You lose.")
