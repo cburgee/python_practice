@@ -30,7 +30,7 @@ element_b = None
 
 
 def get_game_element():
-    return GAME_DATA[random.randint(0, len(GAME_DATA))]
+    return GAME_DATA[random.randint(0, len(GAME_DATA) - 1)]
 
 
 def display(dict):
