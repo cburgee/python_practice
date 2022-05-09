@@ -1,8 +1,7 @@
 from art import logo, vs
-from higher_lower_game_data import data
+from higher_lower_game_data import data as GAME_DATA
 import random
 
-GAME_DATA = data
 HIGHER = 1
 LOWER = 0
 LOGO = logo
@@ -33,7 +32,7 @@ def get_game_element():
     return GAME_DATA[random.randint(0, len(GAME_DATA) - 1)]
 
 
-def display(dict):
+def display_choice(dict):
     name = dict["name"]
     description = dict["description"]
     country = dict["country"]
@@ -43,13 +42,19 @@ def display(dict):
         print(f"{name}, a {description}, from {country}")
 
 
-def compare(dict_a, dict_b):
+def less_than(dict_a, dict_b):
     followers_a = dict_a["follower_count"]
     followers_b = dict_b["follower_count"]
-    if followers_a > followers_b:
-        return HIGHER
-    else:
+    if followers_a < followers_b:
         return LOWER
+    else:
+        return HIGHER
+
+
+def display(elements):
+    display_choice(elements[0])
+    print(VS_ART + "\n")
+    display_choice(elements[1])
 
 
 def reset():
@@ -60,25 +65,21 @@ def reset():
 
 
 print(LOGO + "\n")
-while do_continue == True:
+while do_continue:
     if not element_a:
         element_a = get_game_element()
     if not element_b:
         element_b = get_game_element()
     if element_a == element_b:
         element_a = get_game_element()
-    display(element_a)
-    print(VS_ART + "\n")
-    display(element_b)
-    comparison_result = compare(element_a, element_b)
+    comparison_result = less_than(element_a, element_b)
+    display([element_a, element_b])
     guess = input("Who has more followers? 'A' or 'B' ").lower()
 
-    if guess == "a" and comparison_result == 1:
-        score += 1
-        reset()
-        print(LOGO + "\n")
-        print(f"You're Right! Your score: {score}")
-    elif guess == "b" and comparison_result == 0:
+    won = (guess == "a" and comparison_result == 0) or (
+        guess == "b" and comparison_result == 1
+    )
+    if won:
         score += 1
         reset()
         print(LOGO + "\n")
