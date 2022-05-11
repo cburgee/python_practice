@@ -1,6 +1,6 @@
 from data import MENU
 
-resources = {
+available_resources = {
     "water": 300,
     "milk": 200,
     "coffee": 100,
@@ -14,6 +14,7 @@ money = {
     "penny": 0,
 }
 
+turn_off = True
 # coffee types: "espresso", "latte", "cappuccino"
 
 # Get input from user asking which type of coffee they would like: Espresso/latte/cappuccino
@@ -38,16 +39,17 @@ money = {
 #
 
 
-def display_resources():
+def display_available_resources():
     """Prints the key: value pairs in the resources dictionary"""
-    for k, v in resources.items():
+    for k, v in available_resources.items():
         if k == "money":
-            print(f"{k}: ${v}")
+            v = float(v)
+            print(f"{k.capitalize()}: ${round(v, 2)}")
             continue
         if k == "coffee":
-            print(f"{k}: {v}g")
+            print(f"{k.capitalize()}: {v}g")
             continue
-        print(f"{k}: {v}mL")
+        print(f"{k.capitalize()}: {v}mL")
 
 
 def display_menu():
@@ -61,11 +63,11 @@ def are_resources_available(coffee_type):
     resource_expenditure = MENU[coffee_type]["ingredients"]
     issue_resource = None
     for i in resource_expenditure:
-        if resource_expenditure[i] <= resources[i]:
+        if resource_expenditure[i] <= available_resources[i]:
             enough_resources = True
         else:
             enough_resources = False
-            issue_resource = resource_expenditure[i]
+            issue_resource = i
             break
     return enough_resources, issue_resource
 
@@ -81,7 +83,7 @@ def get_coin_total_dollar_amount(dict):
 
 def calculate_change(dollar_amount, coffee_type):
     cost = MENU[coffee_type]["cost"]
-    return dollar_amount - cost
+    return round(dollar_amount - cost, 2)
 
 
 def enough_funds(coffee_type, dollar_amount):
@@ -93,29 +95,47 @@ def enough_funds(coffee_type, dollar_amount):
         return True
 
 
-def make_coffee(coffee_choice, money):
-    success_message = f"Here is your {coffee_choice}!"
-    if are_resources_available(coffee_choice) == True:
-        if enough_funds(coffee_choice, money) == True:
+def update_machine_values(coffee_type, dollar_amount):
+    spent_resources = MENU[coffee_type]["ingredients"]
+    available_resources["money"] += MENU[coffee_type]["cost"]
+    for i in spent_resources:
+        available_resources[i] -= spent_resources[i]
+
+
+def make_coffee(coffee_choice, dollar_amount):
+    success_message = f"Here is your {coffee_choice}! Enjoy!"
+    resource_availability = are_resources_available(coffee_choice)
+    if resource_availability[0] == True:
+        if enough_funds(coffee_choice, dollar_amount) == True:
+            update_machine_values(coffee_choice, dollar_amount)
             print(success_message)
+            print(
+                f"Here is your change!: ${calculate_change(dollar_amount, coffee_choice)}"
+            )
         else:
             print("Insufficient Funds.")
+            print(f"Here is your full refund: ${dollar_amount}")
     else:
-        print("Insufficient resources.")
+        print(f"Insufficient resources. Not enough {resource_availability[1]}")
+        print(f"Here is your full refund: ${dollar_amount}")
 
 
 if __name__ == "__main__":
     print("Coffee Machine turned on! Welcome.")
     display_menu()
-    coffee_choice = input(
-        "What type of coffee would you like? (Espresso, Latte, or Cappuccino)"
-    ).lower()
-    money["quarter"] = int(input("How many quarters to insert?: "))
-    money["dime"] = int(input("How many dimes to insert?: "))
-    money["nickel"] = int(input("How many nickels to insert?: "))
-    money["penny"] = int(input("How many pennies to insert?: "))
-    # print(get_coin_total_dollar_amount(money))
-    # print(are_resources_available("cappuccino"))
-    # display_menu()
-    # print(enough_funds("latte", 3.50))
-    # print(f"${calculate_change(3.71, 'latte')}")
+    while turn_off:
+        coffee_choice = input(
+            "What type of coffee would you like? (Espresso, Latte, or Cappuccino)"
+        ).lower()
+        if coffee_choice == "report":
+            display_available_resources()
+            continue
+        if coffee_choice == "off":
+            break
+        print("Please insert coins.")
+        money["quarter"] = int(input("How many quarters: "))
+        money["dime"] = int(input("How many dimes: "))
+        money["nickel"] = int(input("How many nickels: "))
+        money["penny"] = int(input("How many pennies: "))
+        inserted_money = get_coin_total_dollar_amount(money)
+        make_coffee(coffee_choice, inserted_money)
