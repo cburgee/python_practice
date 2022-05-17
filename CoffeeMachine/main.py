@@ -14,29 +14,7 @@ money = {
     "penny": 0,
 }
 
-turn_off = True
-# coffee types: "espresso", "latte", "cappuccino"
-
-# Get input from user asking which type of coffee they would like: Espresso/latte/cappuccino
-# When coffee type is chosen, check if resources are available to make drink
-# if there are enough resources, check to see if money given is sufficient
-# if not enough money, simple print statement saying money refunded, else process the transaction
-# if too much money given, give back change an display amount (ROUND TO TWO DECIMAL PLACES)
-# if transaction successful, reduce amount of resources available in coffee machine
-# if all goes well, print enjoy your coffee as final step
-# "off" to exit
-# "report" to list the current available resources Water, milk, coffee, and money in the machine
-# Coffee item structure:
-# "latte": {
-#         "ingredients": {
-#             "water": 200,
-#             "milk": 150,
-#             "coffee": 24,
-#         },
-#         "cost": 2.5,
-#     },
-#
-#
+is_on = True
 
 
 def display_available_resources():
@@ -95,7 +73,7 @@ def enough_funds(coffee_type, dollar_amount):
         return True
 
 
-def update_machine_values(coffee_type, dollar_amount):
+def update_machine_values(coffee_type):
     spent_resources = MENU[coffee_type]["ingredients"]
     available_resources["money"] += MENU[coffee_type]["cost"]
     for i in spent_resources:
@@ -107,7 +85,7 @@ def make_coffee(coffee_choice, dollar_amount):
     resource_availability = are_resources_available(coffee_choice)
     if resource_availability[0] == True:
         if enough_funds(coffee_choice, dollar_amount) == True:
-            update_machine_values(coffee_choice, dollar_amount)
+            update_machine_values(coffee_choice)
             print(success_message)
             print(
                 f"Here is your change!: ${calculate_change(dollar_amount, coffee_choice)}"
@@ -123,7 +101,7 @@ def make_coffee(coffee_choice, dollar_amount):
 if __name__ == "__main__":
     print("Coffee Machine turned on! Welcome.")
     display_menu()
-    while turn_off:
+    while is_on:
         coffee_choice = input(
             "What type of coffee would you like? (Espresso, Latte, or Cappuccino)"
         ).lower()
